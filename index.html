@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test Data Sheet Builder</title>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<style>
+body{
+    font-family:Segoe UI,sans-serif;
+    background:#f4f6f8;
+    margin:0;
+}
+
+header{
+    background:#2563eb;
+    color:white;
+    padding:20px;
+    text-align:center;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+    display:grid;
+    grid-template-columns:300px 1fr;
+    gap:20px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 2px 6px rgba(0,0,0,.1);
+}
+
+input,textarea{
+    width:100%;
+    padding:10px;
+    margin-bottom:10px;
+    box-sizing:border-box;
+}
+
+button{
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:10px 15px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.question{
+    display:grid;
+    grid-template-columns:1fr 120px 100px;
+    gap:10px;
+    margin-bottom:10px;
+}
+
+@media(max-width:900px){
+.container{
+grid-template-columns:1fr;
+}
+}
+
+.dark{
+background:#111827;
+color:white;
+}
+
+.dark .card{
+background:#1f2937;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>📊 Test Data Sheet Builder</h1>
+<p>Create assessment spreadsheets instantly.</p>
+</header>
+
+<div class="container">
+
+<div>
+<div class="card">
+
+<h3>Dashboard</h3>
+
+<p>Students: <span id="studentCount">0</span></p>
+<p>Questions: <span id="questionCount">0</span></p>
+<p>Total Marks: <span id="totalMarks">0</span></p>
+
+<button onclick="toggleDarkMode()">Dark Mode</button>
+
+<hr>
+
+<button onclick="exportWorkbook()">Download XLSX</button>
+
+</div>
+</div>
+
+<div>
+
+<div class="card">
+<h2>Test Name</h2>
+<input id="testName" placeholder="Unit A1 Test">
+</div>
+
+<div class="card">
+<h2>Students</h2>
+
+<textarea id="studentList"
+rows="8"
+placeholder="One student per line"></textarea>
+
+<button onclick="loadStudents()">Load Students</button>
+
+</div>
+
+<div class="card">
+
+<h2>Questions</h2>
+
+<div id="questionContainer"></div>
+
+<button onclick="addQuestion()">+ Add Question</button>
+
+</div>
+
+</div>
+</div>
+
+<script>
+
+let students = [];
+let questions = [];
+
+function saveData(){
+localStorage.setItem(
+"testBuilder",
+JSON.stringify({
+students,
+questions,
+testName:document.getElementById("testName").value
+})
+);
+}
+
+function loadData(){
+
+const saved =
+JSON.parse(localStorage.getItem("testBuilder"));
+
+if(!saved) return;
+
+students=saved.students||[];
+questions=saved.questions||[];
+
+document.getElementBy
